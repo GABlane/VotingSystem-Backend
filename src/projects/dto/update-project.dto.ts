@@ -13,4 +13,8 @@ export class UpdateProjectDto {
   @IsBoolean()
   @IsOptional()
   is_active?: boolean;
+
+  @IsString()
+  @IsOptional()
+  logo_url?: string;
 }
