@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Testing
+coverage/
+*.log
+
+# Build artifacts (will be rebuilt on Railway)
+dist/
+
+# Environment files (use Railway's env vars instead)
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+test/
+*.spec.ts
+*.test.ts
+
+# Development
+scripts/seed-admin.js
