@@ -100,4 +100,11 @@ export class ProjectsController {
   ) {
     return this.projectsService.uploadLogo(id, file);
   }
+
+  // Admin only - Regenerate QR code
+  @Post(':id/regenerate-qr')
+  @UseGuards(JwtAuthGuard)
+  regenerateQRCode(@Param('id') id: string) {
+    return this.projectsService.regenerateQRCode(id);
+  }
 }

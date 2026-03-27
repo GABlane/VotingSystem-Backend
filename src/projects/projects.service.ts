@@ -133,6 +133,8 @@ export class ProjectsService {
         id: project.id,
         title: project.title,
         description: project.description,
+        logo_url: project.logo_url,
+        qr_code_url: project.qr_code_url,
         total_votes: project.total_votes,
         created_at: project.created_at,
       },
@@ -198,6 +200,31 @@ export class ProjectsService {
         throw error;
       }
       throw new InternalServerErrorException('Logo upload failed');
+    }
+  }
+
+  async regenerateQRCode(id: string): Promise<{ qr_code_url: string }> {
+    // Verify project exists
+    await this.findOne(id);
+
+    try {
+      // Generate QR code
+      const qrCodeUrl = await this.qrService.generateQRCode(id);
+
+      // Update project with QR code URL
+      const { error: updateError } = await supabase
+        .from('projects')
+        .update({ qr_code_url: qrCodeUrl })
+        .eq('id', id);
+
+      if (updateError) {
+        throw new InternalServerErrorException('Failed to update QR code');
+      }
+
+      return { qr_code_url: qrCodeUrl };
+    } catch (error) {
+      console.error('QR code regeneration failed:', error);
+      throw new InternalServerErrorException('Failed to regenerate QR code');
     }
   }
 }
