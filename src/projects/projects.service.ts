@@ -147,4 +147,57 @@ export class ProjectsService {
 
     return this.qrService.generatePrintableQR(id);
   }
+
+  async uploadLogo(
+    projectId: string,
+    file: Express.Multer.File,
+  ): Promise<{ logo_url: string }> {
+    try {
+      // Verify project exists
+      await this.findOne(projectId);
+
+      // Generate unique filename
+      const fileExt = file.originalname.split('.').pop();
+      const fileName = `${projectId}-${Date.now()}.${fileExt}`;
+      const filePath = `logos/${fileName}`;
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('project-logos')
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+          upsert: true, // Replace if exists
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        throw new InternalServerErrorException('Failed to upload logo');
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('project-logos')
+        .getPublicUrl(filePath);
+
+      const logo_url = urlData.publicUrl;
+
+      // Update project with logo URL
+      const { error: updateError } = await supabase
+        .from('projects')
+        .update({ logo_url })
+        .eq('id', projectId);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        throw new InternalServerErrorException('Failed to update project');
+      }
+
+      return { logo_url };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Logo upload failed');
+    }
+  }
 }

@@ -8,7 +8,10 @@ import {
   Delete,
   UseGuards,
   Res,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -71,5 +74,30 @@ export class ProjectsController {
     });
 
     res.send(buffer);
+  }
+
+  // Admin only - Upload project logo
+  @Post(':id/upload-logo')
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(
+    FileInterceptor('logo', {
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5MB max
+      },
+      fileFilter: (req, file, cb) => {
+        // Only accept images
+        if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|webp)$/)) {
+          cb(new Error('Only image files are allowed'), false);
+        } else {
+          cb(null, true);
+        }
+      },
+    }),
+  )
+  async uploadLogo(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.projectsService.uploadLogo(id, file);
   }
 }
