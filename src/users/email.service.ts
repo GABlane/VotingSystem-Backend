@@ -14,8 +14,11 @@ export class EmailService {
       throw new Error('RESEND_API_KEY is not defined in environment variables');
     }
     this.resend = new Resend(apiKey);
-    this.fromEmail =
+    const fromEmail =
       this.configService.get<string>('RESEND_FROM_EMAIL') || 'noreply@yourdomain.com';
+    const fromName =
+      this.configService.get<string>('RESEND_FROM_NAME') || 'Voting';
+    this.fromEmail = `${fromName} <${fromEmail}>`;
     this.frontendUrl =
       this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3000';
   }
