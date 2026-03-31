@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { VotesService } from './votes.service';
 import { VotesController } from './votes.controller';
-import { FingerprintModule } from '../fingerprint/fingerprint.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [FingerprintModule],
+  imports: [UsersModule],
   controllers: [VotesController],
   providers: [VotesService],
 })

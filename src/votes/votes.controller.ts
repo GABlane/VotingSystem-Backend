@@ -1,37 +1,20 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Param,
-  Body,
-  Req,
-  Query,
-} from '@nestjs/common';
+import { Controller, Post, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { VotesService } from './votes.service';
-import { CastVoteDto } from './dto/cast-vote.dto';
+import { UserJwtAuthGuard } from '../common/guards/user-jwt-auth.guard';
 
 @Controller('votes')
 export class VotesController {
   constructor(private readonly votesService: VotesService) {}
 
   @Post(':projectId')
-  castVote(
-    @Param('projectId') projectId: string,
-    @Body() castVoteDto: CastVoteDto,
-    @Req() request: any,
-  ) {
-    return this.votesService.castVote(projectId, castVoteDto, request);
+  @UseGuards(UserJwtAuthGuard)
+  castVote(@Param('projectId') projectId: string, @Req() req: any) {
+    return this.votesService.castVote(projectId, req.user.userId, req);
   }
 
   @Get(':projectId/check')
-  checkIfVoted(
-    @Param('projectId') projectId: string,
-    @Query('fingerprint') fingerprintData: string,
-    @Req() request: any,
-  ) {
-    if (!fingerprintData) {
-      return { hasVoted: false };
-    }
-    return this.votesService.checkIfVoted(projectId, fingerprintData, request);
+  @UseGuards(UserJwtAuthGuard)
+  checkIfVoted(@Param('projectId') projectId: string, @Req() req: any) {
+    return this.votesService.checkIfVoted(projectId, req.user.userId);
   }
 }

@@ -2,13 +2,13 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
-export class JwtAuthGuard extends AuthGuard('jwt') {
+export class UserJwtAuthGuard extends AuthGuard('jwt') {
   handleRequest(err: any, user: any) {
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      throw err || new UnauthorizedException('Login required to vote');
     }
-    if (user.role !== 'admin') {
-      throw new UnauthorizedException('Admin access required');
+    if (user.role !== 'user') {
+      throw new UnauthorizedException('User account required');
     }
     return user;
   }
