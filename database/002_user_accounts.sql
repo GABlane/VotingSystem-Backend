@@ -7,6 +7,9 @@ CREATE TABLE IF NOT EXISTS users (
   email TEXT UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
   votes_remaining INT NOT NULL DEFAULT 5,
+  email_verified BOOLEAN NOT NULL DEFAULT false,
+  verification_token TEXT,
+  verification_token_expires_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 

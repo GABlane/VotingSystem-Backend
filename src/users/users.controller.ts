@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Get, Body, Query, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
@@ -11,6 +11,11 @@ export class UsersController {
   @Post('register')
   register(@Body() dto: RegisterUserDto) {
     return this.usersService.register(dto);
+  }
+
+  @Get('verify-email')
+  verifyEmail(@Query('token') token: string) {
+    return this.usersService.verifyEmail(token);
   }
 
   @Post('login')
